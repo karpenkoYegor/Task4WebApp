@@ -29,6 +29,7 @@ namespace Task4WebApp.Controllers
             if (!User.Identity.IsAuthenticated) return RedirectToAction("Login", "Account");
             var currentUser = _users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
             if (currentUser == null) return RedirectToAction("Login", "Account");
+            if (currentUser.UserData.IsBlocked) _signInManager.SignOutAsync();
             if (!currentUser.UserData.IsBlocked)
             { 
                 List<UserRowModel> usersModel = new List<UserRowModel>();
@@ -81,6 +82,8 @@ namespace Task4WebApp.Controllers
                 foreach (var userId in model.UniqueName)
                 {
                     var user = _users.Where(u => u.UserData.UserDataId == Convert.ToInt32(userId)).First();
+                    if (user == currentUser)
+                        _signInManager.SignOutAsync();
                     _repository.UserAccount.Delete(user);
                 }
                 _repository.Save();
@@ -102,7 +105,6 @@ namespace Task4WebApp.Controllers
                 }
                 _repository.Save();
             }
-            
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
