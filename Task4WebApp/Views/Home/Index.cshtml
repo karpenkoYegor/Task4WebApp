@@ -1,0 +1,75 @@
+﻿@model IndexViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <form method="post">
+        <div class="row-9">
+            <button onclick="Toast('Пользователь разблокирован')" type="submit" id="unBlockBtn" title="Разблокировать" asp-controller="Home" asp-action="UnBlockUsers" class="col btn btn-success"><i class="fa fa-solid fa-check"></i></button>
+            <button onclick="Toast('Пользователь заблокирован')" type="submit" title="Заблокировать" asp-controller="Home" asp-action="BlockUsers" class="col btn btn-dark"><i class="fa fa-solid fa-ban"></i></button>
+            <button onclick="Toast('Пользователь удалён')" type="submit" title="Удалить" asp-controller="Home" asp-action="DeleteUsers" class="col btn btn-danger"><i class="fa fa-solid fa-trash"></i></button>
+        </div>
+        <table class="table">
+            <tr>
+                <td>
+
+                    <input
+                        class="form-check-input main-check"
+                        type="checkbox"
+                        onclick="changeCheckboxes()"/>
+                </td>
+                <td>Идентификатор</td>
+                <td>Имя</td>
+                <td>Мыло</td>
+                <td>Дата регистрации</td>
+                <td>Дата последней авторизации</td>
+                <td>Статус</td>
+            </tr>
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td>
+                        <input
+                            class="form-check-input table-checkbox"
+                            type="checkbox"
+                            value="@user.Checkbox.Value"
+                            name="UniqueName"
+                            id="checkbox_@user.Checkbox.Value"
+                            checked="@user.Checkbox.IsChecked"
+                            onclick="changeMainCheckBox()"/>
+                    </td>
+                    <td><label for="checkbox_@user.Checkbox.Value">@user.User.Id</label></td>
+                    <td>@user.User.UserData.Name</td>
+                    <td>@user.User.Email</td>
+                    <td>@user.User.UserData.RegisterDate.ToShortDateString()</td>
+                    <td>@user.User.UserData.LastLoginTime</td>
+                    @if (@user.User.UserData.IsBlocked)
+                    {
+                        <td>Blocked</td>
+                    }
+                    else
+                    {
+                        <td>Not blocked</td>     
+                    }
+                </tr>
+            }
+        </table>
+    </form>
+}
+else
+{
+    <a asp-controller="Account" asp-action="Login">Вход</a>
+    <a asp-controller="Account" asp-action="Register">Регистрация</a>
+}
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <p id="toastText"></p>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
